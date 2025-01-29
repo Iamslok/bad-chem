@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad Chem</title>
+    <style>
+        #camera {
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+            text-align: center;
+        }
+        #video {
+            width: 100%;
+            border: 1px solid black;
+        }
+        #canvas {
+            display: none;
+        }
+        #capture {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <audio id="music" src="audio1.mp3"></audio>
+
+    <div id="camera">
+        <video id="video" autoplay></video>
+        <button id="capture">Capture Photo</button>
+        <canvas id="canvas"></canvas>
+        <img id="photo" alt="Captured Photo">
+    </div>
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const photo = document.getElementById('photo');
+        const captureButton = document.getElementById('capture');
+        const music = document.getElementById('music');
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                console.error("Error accessing webcam: ", err);
+            });
+
+        captureButton.addEventListener('click', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL('image/png');
+            photo.src = dataUrl;
+            photo.style.display = 'block';
+            music.play();
+        });
+    </script>
+</body>
+</html>
