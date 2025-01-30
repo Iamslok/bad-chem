@@ -10,6 +10,10 @@
       integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
       crossorigin="anonymous"
     />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
       integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
@@ -19,20 +23,11 @@
       #camera {
         width: 100%;
         max-width: 400px;
-        margin: 20px;
-        text-align: center;
-      }
-      #image-styles {
-        width: 100%;
-        max-width: 400px;
+        margin: 20px auto;
         text-align: center;
       }
       #video {
         width: 100%;
-        border: 1px solid black;
-      }
-      #photo {
-        width: 68%;
         border: 1px solid black;
       }
       #canvas {
@@ -42,45 +37,88 @@
       #roastme {
         margin-top: 10px;
       }
+      #loading-gif {
+        display: none;
+        margin-top: 10px;
+      }
+
+      .fixed {
+        position: fixed;
+      }
+      .inset-0 {
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+      }
     </style>
   </head>
-  <body>
+  <body class="bg-gray-100">
     <audio id="music" src="audio1.mp3"></audio>
 
-    <div class="container mt-5">
-      <div class="card">
-        <div class="card-header text-center">
-          <h2>Capture Your Photo</h2>
+    <div class="container mx-auto mt-10">
+      <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="bg-blue-500 text-white text-center py-4">
+          <h2 class="text-2xl font-bold">Capture Your Photo</h2>
         </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6">
-              <div id="camera">
-                <video id="video" class="img-fluid rounded" autoplay></video>
-                <button id="capture" class="btn btn-primary mt-3">
+        <div class="p-6">
+          <div class="flex flex-wrap -mx-3">
+            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+              <div id="camera" class="bg-gray-200 p-4 rounded-lg">
+                <video id="video" class="w-full rounded-lg" autoplay></video>
+                <button
+                  id="capture"
+                  class="mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700"
+                >
                   Capture Photo
                 </button>
-                <canvas id="canvas" style="display: none"></canvas>
+                <canvas id="canvas"></canvas>
               </div>
             </div>
-            <div class="col-md-6">
-              <div class="image-styles text-center">
+            <div class="w-full md:w-1/2 px-3">
+              <div class="text-center">
                 <img
-                  class="mt-3 mx-auto d-block img-fluid rounded"
+                  class="mt-3 mx-auto rounded-lg shadow-lg"
                   id="photo"
                   alt="Capture your image babe, I wanna see your lovely face 😒"
+                  style="display: none"
                 />
-                <button id="roastme" class="btn btn-danger mt-3" disabled>
+                <button
+                  id="roastme"
+                  class="mt-3 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-700"
+                  style="display: none"
+                >
                   Roast me
                 </button>
                 <div
                   id="roast-response"
-                  class="mt-3 text-center text-danger fw-bold"
+                  class="mt-3 text-center text-red-500 font-bold"
                 ></div>
               </div>
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div
+      id="gifModal"
+      class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center"
+    >
+      <div class="bg-white p-6 rounded-lg max-w-lg w-full mx-4">
+        <img
+          id="randomGif"
+          class="w-full rounded-lg"
+          src=""
+          alt="Reaction GIF"
+        />
+        <button
+          onclick="closeModal()"
+          class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700"
+        >
+          Close
+        </button>
       </div>
     </div>
 
@@ -91,6 +129,32 @@
       const roastme = document.getElementById("roastme");
       const captureButton = document.getElementById("capture");
       const music = document.getElementById("music");
+
+      const gifs = [
+        "gifs/gif1.gif",
+        "gifs/gif2.gif",
+        "gifs/gif3.gif",
+        "gifs/gif4.gif",
+        "gifs/gif5.gif",
+        "gifs/gif6.gif",
+        "gifs/gif7.gif","gifs/gif8.gif","gifs/gif9.gif","gifs/gif10.gif","gifs/gif11.gif","gifs/gif12.gif","gifs/gif13.gif","gifs/gif14.gif",
+      ];
+
+      function showRandomGif() {
+        const randomIndex = Math.floor(Math.random() * gifs.length);
+        const modal = document.getElementById("gifModal");
+        const randomGif = document.getElementById("randomGif");
+
+        randomGif.src = gifs[randomIndex];
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      }
+
+      function closeModal() {
+        const modal = document.getElementById("gifModal");
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+      }
 
       navigator.mediaDevices
         .getUserMedia({ video: true })
@@ -110,7 +174,11 @@
         const dataUrl = canvas.toDataURL("image/png");
         photo.src = dataUrl;
         photo.style.display = "block";
+        roastme.style.display = "block";
         roastme.disabled = false;
+        setTimeout(() => {
+          showRandomGif();
+        }, 2000);
         music.play();
       });
       const apiKey = "AIzaSyBWsT9Rg-Iw2KnIQkr61rSp-FZ5SYarRKo";
@@ -119,7 +187,6 @@
         const roastButton = document.getElementById("roastme");
         roastButton.innerText = "Roasting...";
         roastButton.disabled = true;
-
         const prompt =
           "Take humour Jian Yang from Silicon Valley. Be brutally savage, unpredictable, and ridiculously hilarious. Use his broken English, weird logic, and insane insults. Make it sound like a mix of roast, scam pitch, and passive-aggressive Asian auntie rant. Add some censored bad words (@#%!) for extra spice. Go full super crazy mode—no mercy, no chill. DON'T GET THE Jian Yang NAME IN THE REPONSE USE WEIRD NAME, AND DON'T KEEP IT LONG, you're roasting a person in a picture.";
 
